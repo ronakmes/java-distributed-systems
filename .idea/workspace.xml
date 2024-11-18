@@ -4,10 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a6801bcc-02a7-424a-8c38-5983434160d3" name="Changes" comment="Remove unnecessary array">
+    <list default="true" id="a6801bcc-02a7-424a-8c38-5983434160d3" name="Changes" comment="Add Alpha">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Alpha.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Alpha.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Beta.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Beta.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Charlie.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Charlie.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Delta.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Delta.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Echo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Echo.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -101,7 +103,7 @@
       <option name="presentableId" value="Default" />
       <updated>1731919911548</updated>
       <workItem from="1731919912598" duration="3379000" />
-      <workItem from="1731933847894" duration="2938000" />
+      <workItem from="1731933847894" duration="3850000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit">
       <option name="closed" value="true" />
@@ -143,7 +145,15 @@
       <option name="project" value="LOCAL" />
       <updated>1731935023884</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Add Alpha">
+      <option name="closed" value="true" />
+      <created>1731936941333</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1731936941333</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -177,6 +187,7 @@
     <MESSAGE value="initial commit" />
     <MESSAGE value="seting up" />
     <MESSAGE value="Remove unnecessary array" />
-    <option name="LAST_COMMIT_MESSAGE" value="Remove unnecessary array" />
+    <MESSAGE value="Add Alpha" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add Alpha" />
   </component>
 </project>
