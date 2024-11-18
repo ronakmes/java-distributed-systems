@@ -1,22 +1,23 @@
-
 import java.net.*;
 import java.util.*;
 import java.io.*;
 
-
 public class Main {
-    // Addresses and ports for the worker processes
     private static final String WORKER_ADDRESS = "localhost";
     private static final int[] WORKER_PORTS = {5001, 5002, 5003, 5004, 5005};
     private static final Random RANDOM = new Random();
+    private static int lamportClock = 0; // Lamport clock for Main process
 
     public static void main(String[] args) {
-
         Scanner scanner = new Scanner(System.in);
 
         // Step 1: Get user input
         System.out.print("Enter a paragraph: ");
         String paragraph = scanner.nextLine();
+        if (paragraph.trim().isEmpty()) {
+            System.err.println("Paragraph cannot be empty. Please restart and enter valid input.");
+            return;
+        }
         String[] words = paragraph.split("\\s+"); // Split paragraph into words
 
         // Step 2: Randomly distribute words to workers
@@ -42,7 +43,6 @@ public class Main {
             Thread.sleep(15000);
         } catch (InterruptedException e) {
             System.err.println("Error while waiting: " + e.getMessage());
-
         }
 
         // Step 4: Collect words from workers
@@ -57,34 +57,47 @@ public class Main {
         System.out.println("Reconstructed paragraph: " + reconstructedParagraph);
     }
 
+    // Sends words to a worker process
     private static void sendWordsToWorker(int port, List<String> words) {
-        try (Socket socket = new Socket(Main.WORKER_ADDRESS, port);
-             PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
+        try (Socket socket = new Socket(WORKER_ADDRESS, port);
+             BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))) {
+            lamportClock++; // Increment Lamport clock before sending
+            out.write("CLOCK:" + lamportClock + "\n"); // Send the current Lamport clock
+
             for (String word : words) {
-                out.println(word); // Send each word to the worker
+                out.write(word + "\n"); // Send each word
             }
-            out.println("END"); // Signal end of word transmission
+            out.write("END\n"); // Signal end of word transmission
+            out.flush(); // Ensure all data is sent
         } catch (IOException e) {
-            System.err.println("Error sending words to worker at " + Main.WORKER_ADDRESS + ":" + port);
+            System.err.println("Error sending words to worker at " + WORKER_ADDRESS + ":" + port + " - " + e.getMessage());
         }
     }
 
+    // Collects words from a worker process
     private static List<String> collectWordsFromWorker(int port) {
         List<String> words = new ArrayList<>();
-        try (Socket socket = new Socket(Main.WORKER_ADDRESS, port);
+        try (Socket socket = new Socket(WORKER_ADDRESS, port);
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-             PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
-            out.println("COLLECT"); // Request to collect words
+             BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))) {
+            lamportClock++; // Increment Lamport clock before requesting collection
+            out.write("COLLECT:CLOCK:" + lamportClock + "\n"); // Send collection request with clock
+            out.flush(); // Ensure the message is sent
 
-            String word;
-            while ((word = in.readLine()) != null) {
-                if ("END".equals(word)) {
+            String line;
+            while ((line = in.readLine()) != null) {
+                if (line.startsWith("CLOCK:")) {
+                    // Update Lamport clock based on the received clock value
+                    int receivedClock = Integer.parseInt(line.split(":")[1]);
+                    lamportClock = Math.max(lamportClock, receivedClock) + 1;
+                } else if ("END".equals(line)) {
                     break; // End of transmission
+                } else {
+                    words.add(line); // Add received word to the list
                 }
-                words.add(word);
             }
         } catch (IOException e) {
-            System.err.println("Error collecting words from worker at " + Main.WORKER_ADDRESS + ":" + port);
+            System.err.println("Error collecting words from worker at " + WORKER_ADDRESS + ":" + port + " - " + e.getMessage());
         }
         return words;
     }
