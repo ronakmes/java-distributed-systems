@@ -81,7 +81,7 @@ public class Main {
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
              BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))) {
             lamportClock++; // Increment Lamport clock before requesting collection
-            out.write("COLLECT:CLOCK:" + lamportClock + "\n"); // Send collection request with clock
+            out.write("COLLECT\n"); // Send collection request
             out.flush(); // Ensure the message is sent
 
             String line;
