@@ -29,15 +29,14 @@ public class Alpha {
                             // Collect request from Main
                             lamportClock++; // Increment before responding
                             out.write("CLOCK:" + lamportClock + "\n"); // Send updated clock
-                            for (String word : words) {
-                                out.write(word + "\n"); // Send stored words
+                            for (Pair<String, Integer> word : words) {
+                                out.write(word.getKey() + "\n"); // Send stored words
                             }
                             out.write("END\n"); // End of collection
                             out.flush();
-                            break; // Done handling this request
                         } else {
                             // Store received word
-                            words.add(line);
+                            words.add(new Pair<>(line, lamperClock));
                         }
                     }
                 } catch (IOException e) {
@@ -46,6 +45,23 @@ public class Alpha {
             }
         } catch (IOException e) {
             System.err.println("Failed to start Alpha process on port " + PORT + ": " + e.getMessage());
+        }
+    }
+private static class Pair<K, V> {
+        private final K key;
+        private final V value;
+
+        public Pair(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        public K getKey() {
+            return key;
+        }
+
+        public V getValue() {
+            return value;
         }
     }
 }
