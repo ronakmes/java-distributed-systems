@@ -7,6 +7,7 @@ public class Main {
     private static final int[] WORKER_PORTS = {5001, 5002, 5003, 5004, 5005};
     private static final Random RANDOM = new Random();
     private static int lamportClock = 0; // Lamport clock for Main process
+    private static final Map<String, Integer> wordOrder = new HashMap<>();
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -53,8 +54,12 @@ public class Main {
         }
 
         // Step 5: Reconstruct and print the paragraph
-        String reconstructedParagraph = String.join(" ", collectedWords);
-        System.out.println("Reconstructed paragraph: " + reconstructedParagraph);
+        collectedWords.sort(Comparator.comparingInt(Pair::getValue)); 
+        String reconstructedParagraph = collectedWords.stream()
+                .map(Pair::getKey)
+                .sorted(Comparator.comparingInt(wordOrder::get)) 
+                .reduce("", (partial, word) -> partial + " " + word).trim();
+       
     }
 
     // Sends words to a worker process
@@ -75,8 +80,8 @@ public class Main {
     }
 
     // Collects words from a worker process
-    private static List<String> collectWordsFromWorker(int port) {
-        List<String> words = new ArrayList<>();
+    private static List<String, Integer> collectWordsFromWorker(int port) {
+        List<String, Integer> words = new ArrayList<>();
         try (Socket socket = new Socket(WORKER_ADDRESS, port);
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
              BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))) {
@@ -93,12 +98,29 @@ public class Main {
                 } else if ("END".equals(line)) {
                     break; // End of transmission
                 } else {
-                    words.add(line); // Add received word to the list
+                    words.add(new Pair<>(line, lamportClock));
                 }
             }
         } catch (IOException e) {
-            System.err.println("Error collecting words from worker at " + WORKER_ADDRESS + ":" + port + " - " + e.getMessage());
+            System.err.println("Error collecting words from worker at port " + port + ": " + e.getMessage());
         }
         return words;
+    }
+ private static class Pair<K, V> {
+        private final K key;
+        private final V value;
+
+        public Pair(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        public K getKey() {
+            return key;
+        }
+
+        public V getValue() {
+            return value;
+        }
     }
 }
