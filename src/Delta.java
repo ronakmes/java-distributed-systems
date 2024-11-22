@@ -5,7 +5,7 @@ import java.io.*;
 public class Delta {
     private static final int PORT = 5004; // Unique port for Delta
     private static int lamportClock = 0; // Lamport clock for Delta
-    private static final List<String> words = new ArrayList<>(); // Words assigned to Delta
+    private static final List<Pair<String, Integer>> words = new ArrayList<>(); // Words assigned to Delta
 
     public static void main(String[] args) {
         System.out.println("Delta process started on port " + PORT);
@@ -19,25 +19,20 @@ public class Delta {
                     String line;
                     while ((line = in.readLine()) != null) {
                         if (line.startsWith("CLOCK:")) {
-                            // Update Lamport clock
                             int receivedClock = Integer.parseInt(line.split(":")[1]);
                             lamportClock = Math.max(lamportClock, receivedClock) + 1;
                         } else if ("END".equals(line)) {
-                            // End of word transmission
                             break;
                         } else if ("COLLECT".equals(line)) {
-                            // Collect request from Main
-                            lamportClock++; // Increment before responding
-                            out.write("CLOCK:" + lamportClock + "\n"); // Send updated clock
-                            for (String word : words) {
-                                out.write(word + "\n"); // Send stored words
+                            lamportClock++;
+                            out.write("CLOCK:" + lamportClock + "\n");
+                            for (Pair<String, Integer> word : words) {
+                                out.write(word.getKey() + "\n");
                             }
-                            out.write("END\n"); // End of collection
+                            out.write("END\n");
                             out.flush();
-                            break; // Done handling this request
                         } else {
-                            // Store received word
-                            words.add(line);
+                            words.add(new Pair<>(line, lamportClock));
                         }
                     }
                 } catch (IOException e) {
@@ -46,6 +41,24 @@ public class Delta {
             }
         } catch (IOException e) {
             System.err.println("Failed to start Delta process on port " + PORT + ": " + e.getMessage());
+        }
+    }
+
+    private static class Pair<K, V> {
+        private final K key;
+        private final V value;
+
+        public Pair(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        public K getKey() {
+            return key;
+        }
+
+        public V getValue() {
+            return value;
         }
     }
 }
